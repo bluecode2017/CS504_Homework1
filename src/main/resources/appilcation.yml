@@ -1,0 +1,15 @@
+Server:
+   port: 9005
+spring:
+   application:
+       name: running-information-analysis-service
+   jpa:
+      database:MYSQL
+      hibernate:
+         ddl-auto: validate
+
+   datasourcve:
+       url:jdbc:mysql://localhost:3306/demo
+       username=root
+       password=vagrant
+       driver-class-name=com.mysql.jdbc.Driver
