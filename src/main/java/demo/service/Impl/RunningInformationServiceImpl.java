@@ -2,12 +2,11 @@ package demo.service.Impl;
 
 
 import demo.domain.RunningInformation;
-import demo.domain.RunningInformationRestRepository;
+import demo.domain.RunningInformationRepository;
 import demo.service.RunningInformationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,26 +15,26 @@ import java.util.List;
 public class RunningInformationServiceImpl implements RunningInformationService {
 
 
-    private RunningInformationRestRepository runningInformationRestRepository;
+    private RunningInformationRepository runningInformationRepository;
     @Autowired
-    public RunningInformationServiceImpl(RunningInformationRestRepository runningInformationRestRepository) {
-        this.runningInformationRestRepository = runningInformationRestRepository;
+    public RunningInformationServiceImpl(RunningInformationRepository runningInformationRepository) {
+        this.runningInformationRepository = runningInformationRepository;
     }
     @Override
     public List<RunningInformation> saveRunningInformation(List<RunningInformation> runningInformations) {
-        return runningInformationRestRepository.save(runningInformations);
+        return runningInformationRepository.save(runningInformations);
     }
 
     @Override
     public void deleteByRunningId(String runningId) {
-        RunningInformation temp = runningInformationRestRepository.findByRunningId(runningId);
-        runningInformationRestRepository.delete(temp);
+        RunningInformation temp = runningInformationRepository.findByRunningId(runningId);
+        runningInformationRepository.delete(temp);
 
     }
 
     @Override
     public Page<RunningInformation> findAll(Pageable pageable) {
-         return runningInformationRestRepository.findAll(pageable);
+         return runningInformationRepository.findAll(pageable);
     }
 
 }

@@ -9,12 +9,11 @@ import java.util.List;
 
 
 public interface RunningInformationService {
-    List<RunningInformation> saveRunningInformation(List<RunningInformation> runningInformations);
+    public List<RunningInformation> saveRunningInformation(List<RunningInformation> runningInformations);
 
-    void deleteByRunningId(String runningId);
-    //void deleteByRunningId(List<RunningInformation> runningInformations, String runningId);
+    public void deleteByRunningId(String runningId);
 
-    Page<RunningInformation> findAll(Pageable pageable);
+    public Page<RunningInformation> findAll(Pageable pageable);
 
 
 }

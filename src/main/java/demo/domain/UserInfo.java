@@ -1,6 +1,7 @@
 package demo.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.javafx.beans.IDProperty;
 import lombok.Data;
 
@@ -24,8 +25,9 @@ public class UserInfo {
 
     }
 
-    public UserInfo(long userId,String userName, String address) {
-        this.userId = userId;
+    public UserInfo(
+            @JsonProperty("username") String userName,
+            @JsonProperty("address") String address) {
         this.userName = userName;
         this.address = address;
     }
