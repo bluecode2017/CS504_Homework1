@@ -1,19 +1,15 @@
-**目录 (Table of Contents)**
-
-[TOCM]
-
-[TOC]
+# Running-Information-Analysis-Service Application
 ## 主要功能
 
-- 此项目为 Running-Information-Analysis-Service, 采用SpringBoot+SpringData+mysql 实现上传RunningInformation数据及查询主要数据。
-- 实现的具体功能需求请参见当前目录下的“需求说明ProjectRequirements”
+* 此项目为 RunningTrackingProject的其中一个backend的service组件, 采用SpringBoot+SpringData+mysql 实现上传RunningInformation数据及查询主要数据。
+* 实现的具体功能需求请参见当前目录下的“需求说明ProjectRequirements”
 
 ## 输入输出
 
-###输入
+### 输入
 输入方式有两种:
 
-1.一种使用 网页/bulkUpload 方式，上传1个或多个Json数据，格式如下
+* 一种使用 网页/bulkUpload 方式，上传1个或多个Json数据，格式如下
 ```
 [
   {
@@ -44,12 +40,12 @@
   }
   ]
   ```
- 2. 另一种，编写shell，在应用启动后，在terminal执行./upload-running-informations.sh 完成数据上传。
+ * 另一种，编写shell，在应用启动后，在terminal执行./upload-running-informations.sh 完成数据上传。
  ```
  #!/usr/bin/env bash
 curl -H "Content-type: application/json" localhost:8080/bulkUpload  -d @runningInformations.json
 ```
-###输出
+### 输出
 因为使用了RESTcontroller，数据的存取都通过 http request 完成。
 *http://localhost:8080/bulkUpload ：批量上传数据
 *http://localhost:8080/purge ：删除所有数据
@@ -84,13 +80,13 @@ curl -H "Content-type: application/json" localhost:8080/bulkUpload  -d @runningI
 项目开发第二阶段，业务功能测试通过后，修改后台数据库为mysql， 在pom.xml里增加mysql-connector-java依赖，在application.yml添加 mysql的连接方式；
 项目开发第三阶段，集成测试，上线提交
 
-###1.新建maven project
+### 1.新建maven project
 
-###2.修改maven配置文件
+### 2.修改maven配置文件
 修改pom.xml ，加入parent 和dependency 和 build. 其中，spring-boot-starter-parent会加载Spring Boot应用所需的所有默认配置； spring-boot-starter-data-jpa会下载所有Spring Data Jpa所需的依赖； 因为此项目是一个web应用，所以添加spring-boot-starter-web.
 
 
-###3.创建项目结构
+### 3.创建项目结构
 项目代码结构 
 ```
 -src 
@@ -110,14 +106,14 @@ curl -H "Content-type: application/json" localhost:8080/bulkUpload  -d @runningI
              |--RunningInformationBulkUploadController (class 启动入口)
 ```
 
-###4.创建主运行程序
+### 4.创建主运行程序
 设为@SpringBootApplication 
 
-###5.创建实体类
+### 5.创建实体类
 domain里的RunningInformation class ,UserInfo class，二者关系目前为为1对1其中userId为自动生成的ID（在数据库中为identity(1,1))，
 这两个实体类关系是embeded 和 embedable.
 
-###6.创建Repository接口继承jpaRepository   
+### 6.创建Repository接口继承jpaRepository   
 项目的RunningInformationRepository接口实现了JpaRepository接口；（实际上JpaRepository实现了PagingAndSortingRepository接口，PagingAndSortingRepository接口实现了CrudRepository接口，CrudRepository接口实现了Repository接口） 因为项目需要返回所有结果，并排序和分页。我调用findAll方法，JpaRepository接口返回的是List, PagingAndSortingRepository和CrudRepository返回的是迭代器；所以我选择JpaRepository接口。
 
 主要代码如下：
@@ -132,7 +128,7 @@ public interface RunningInformationRepository extends JpaRepository<RunningInfor
     void deleteByRunningId(@Param("runningId") String runningId);
 }
 ```
-###7.创建RestController 
+### 7.创建RestController 
 RunningInformationAnalysisController，实现requestmaping。根据需求，提供4种功能：
 /bulkUpload ：批量上传数据，关键代码如下：
 ```
@@ -209,7 +205,7 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
 ``` 
 
 ## 启动应用
-###在程序目录下，依次执行 
+### 在程序目录下，依次执行 启动mysql，编译，运行，上传 
 ```
 docker-compose up -d
 mvn clean install
@@ -217,7 +213,7 @@ java -jar ./target/Running-Information-Analysis-Service-1.0.0.BUILD-SNAPSHOT.jar
 ./upload-running-informations.sh
 
 ```
-###打开postman插件
+### 打开postman插件
 输入localhost:8080/list
 
 输入localhost:8080/deleteByRunningId/07e8db69-99f2-4fe2-b65a-52fbbdf8c32c
