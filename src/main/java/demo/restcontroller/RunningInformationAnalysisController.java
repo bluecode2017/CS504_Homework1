@@ -29,7 +29,7 @@ public class RunningInformationAnalysisController {
     private String userAddress = "userAddress";
     private String healthWarningLevel = "healthWarningLevel";
     private final String kDefaultPage = "0";
-    private final String kDefaultItemPerPage = "40";
+    private final String kDefaultItemPerPage = "2";
 
     @Autowired
     private RunningInformationService runningInformationService;
