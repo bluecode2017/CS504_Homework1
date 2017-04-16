@@ -14,6 +14,6 @@ public interface RunningInformationService {
     public void deleteByRunningId(String runningId);
 
     public Page<RunningInformation> findAll(Pageable pageable);
-
+    public void deleteAll();
 
 }

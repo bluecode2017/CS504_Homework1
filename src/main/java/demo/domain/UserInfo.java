@@ -1,5 +1,6 @@
 package demo.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.javafx.beans.IDProperty;
@@ -14,17 +15,13 @@ import javax.persistence.Id;
 @Embeddable
 @Data
 public class UserInfo {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long userId;
-
     private String userName;
     private String address;
 
     public UserInfo() {
 
     }
-
+    @JsonCreator
     public UserInfo(
             @JsonProperty("username") String userName,
             @JsonProperty("address") String address) {

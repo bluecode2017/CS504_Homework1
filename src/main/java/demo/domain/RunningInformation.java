@@ -16,28 +16,29 @@ public class RunningInformation {
 
     private enum HealthWarningLevel { HIGH,NORMAL,LOW;}
 
-    @Id
-    @GeneratedValue
-    private Long id;
+
 
     private String runningId;
     private double totalRunningTime;
     private int heartRate;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long Id;
+
+
     @Embedded
     private final UserInfo userInfo;
 
     private HealthWarningLevel healthWarningLevel;
 
-    @JsonIgnore
     private double latitude;
-    @JsonIgnore
     private double longitude;
-    @JsonIgnore
     private double runningDistance;
-    @JsonIgnore
     private Date timeStamp;
 
     public RunningInformation(){
+
         this.userInfo = null;
     }
     public RunningInformation(final UserInfo userInfo){
@@ -76,15 +77,11 @@ public class RunningInformation {
             //option 3: Exception
             //option 4: Print warning
         }
-
-        System.out.println(this.heartRate);
+        System.out.println("check random value ---->"+this.heartRate);
     }
 
-    public Long getUserId(){
-        return this.userInfo == null ? null : this.userInfo.getUserId();
-    }
+    public String getUsername(){
 
-   public String getUsername(){
         return this.userInfo == null ? null : this.userInfo.getUserName();
     }
 

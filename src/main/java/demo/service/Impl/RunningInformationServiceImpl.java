@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,14 +28,24 @@ public class RunningInformationServiceImpl implements RunningInformationService 
 
     @Override
     public void deleteByRunningId(String runningId) {
-        RunningInformation temp = runningInformationRepository.findByRunningId(runningId);
-        runningInformationRepository.delete(temp);
 
+        List<RunningInformation> runningInformationList = new ArrayList<RunningInformation>();
+        runningInformationList=runningInformationRepository.findByRunningId(runningId);
+        for(RunningInformation temp: runningInformationList) {
+
+                runningInformationRepository.delete(temp);
+
+        }
     }
 
     @Override
     public Page<RunningInformation> findAll(Pageable pageable) {
          return runningInformationRepository.findAll(pageable);
+    }
+
+    @Override
+    public void deleteAll(){
+         runningInformationRepository.deleteAll();
     }
 
 }
