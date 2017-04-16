@@ -186,8 +186,7 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
             results.add(info);
         }
         return new ResponseEntity<List<JSONObject>>(results,HttpStatus.OK);
-    }
-    @RequestMapping(value = "/purge", method = RequestMethod.DELETE)
+    }   
 ``` 
 
 ``` 
