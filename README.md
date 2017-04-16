@@ -1,4 +1,5 @@
 # Running-Information-Analysis-Service Application
+
 ## 主要功能
 
 * 此项目为 RunningTrackingProject的其中一个backend的service组件, 采用SpringBoot+SpringData+mysql 技术实现了RunningInformation数据上传 和 查询主要数据。
@@ -244,9 +245,10 @@ public interface RunningInformationRepository extends JpaRepository<RunningInfor
     void deleteByRunningId(@Param("runningId") String runningId);
 }
 ```
-### 7.创建RestController 
+###  7.创建RestController 
 RunningInformationAnalysisController，实现requestmaping。根据需求，提供4种功能：
-#### /bulkUpload ：批量上传数据，关键代码如下：
+
+####  /bulkUpload ：批量上传数据，关键代码如下：
 ```
 @RequestMapping(value = "/bulkUpload", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
@@ -260,7 +262,7 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
         return runningInformationRepository.save(runningInformations);
     }
  ```
-#### /deleteByRunningId/{runningId}  ： 按RunningID来删除实体 （实现删除多个结果值的功能）,关键代码如下：
+####  /deleteByRunningId/{runningId}  ： 按RunningID来删除数据 （如果一个RunningID对应多条记录，则删除多条。实现删除多个结果值的功能）,关键代码如下：
 ```
 @RequestMapping(value = "/deleteByRunningId/{runningId}", method = RequestMethod.DELETE)
     public void deleteByRunningId(@PathVariable("runningId") String runningId) {
