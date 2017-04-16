@@ -281,7 +281,9 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
 
         }
     }
-```    
+
+``` 
+
 #### /list 列出所有结果，
 实现按照healthWarningLevel排序，此处因为healthWarningLevel是枚举类型，且根据heartRate的值得到的枚举值，无法根据枚举值排序，所以改为根据heartRate排序，更好的实现了需求。
 
