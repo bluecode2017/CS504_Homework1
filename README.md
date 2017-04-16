@@ -51,10 +51,10 @@ curl -H "Content-type: application/json" localhost:8080/bulkUpload  -d @runningI
 ```
 ### 输出
 因为使用了RESTcontroller，数据的存取都通过 http request 完成。
-* http://localhost:8080/bulkUpload ：批量上传数据
-* http://localhost:8080/purge ：删除所有数据
-* http://localhost:8080/deleteByRunningId/{runningId}  ： 按RunningID来删除相应数据
-* http://localhost:8080/list 列出所有结果（ 返回结果根据healthWarningLevel从高到底进行排序，默认显示第一页，每页2个数据，并根据requirements进行删选，有些属性不输出）.
+* https://localhost:8080/bulkUpload ：批量上传数据
+* https://localhost:8080/purge ：删除所有数据
+* https://localhost:8080/deleteByRunningId/{runningId}  ： 按RunningID来删除相应数据
+* https://localhost:8080/list 列出所有结果（ 返回结果根据healthWarningLevel从高到底进行排序，默认显示第一页，每页2个数据，并根据requirements进行删选，有些属性不输出）.
 
 输出为JSON respon，格式如下：
 ```
@@ -329,9 +329,19 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
 
 ## 启动应用
 ### 在程序目录下，依次执行 启动mysql，编译，运行，上传 
-```
+
+1. 下载代码
+
+git clone https://github.com/bluecode2017/Running-Information-Analysis-Service.git
+cd Running-Information-Analysis-Service
+
+2. 启动数据库
 docker-compose up -d
+
+3. 编译源程序
 mvn clean install
+
+4. 启动server
 java -jar ./target/Running-Information-Analysis-Service-1.0.0.BUILD-SNAPSHOT.jar
 ./upload-running-informations.sh
 
@@ -347,11 +357,12 @@ java -jar ./target/Running-Information-Analysis-Service-1.0.0.BUILD-SNAPSHOT.jar
 
 输入 localhost:8080/list
 
-同时，可以访问mysql数据库来查看数据的变化，使用
+同时，可以访问mysql数据库来查看数据的变化，如果不存在running_information_analysis_db，就新建.
 ```
 mysql --host=127.0.0.1 --port=3306 --user=root --password=root
 
-mysql> show databases；
+mysql> show databases;
+mysql> create database running_information_analysis_db;
 mysql> use running_information_analysis_db;
 mysql> select * from private;
 ```
