@@ -1,15 +1,14 @@
 # Running-Information-Analysis-Service Application
 ## 主要功能
 
-* 此项目为 RunningTrackingProject的其中一个backend的service组件, 采用SpringBoot+SpringData+mysql 实现上传RunningInformation数据及查询主要数据。
-* 实现的具体功能需求请参见当前目录下的“需求说明ProjectRequirements”
+* 此项目为 RunningTrackingProject的其中一个backend的service组件, 采用SpringBoot+SpringData+mysql 技术实现了RunningInformation数据上传 和 查询主要数据。
+* 具体功能需求请参见当前目录下的《ProjectRequirements》
 
 ## 输入输出
 
 ### 输入
-输入方式有两种:
 
-* 一种使用 网页/bulkUpload 方式，上传1个或多个Json数据，格式如下
+输入的数据为JSON格式的源数据，格式如下：
 ```
 [
   {
@@ -40,7 +39,12 @@
   }
   ]
   ```
- * 另一种，编写shell，在应用启动后，在terminal执行./upload-running-informations.sh 完成数据上传。
+  
+输入方式有两种:
+
+* 一种使用 网页/bulkUpload 方式，在Body处复制源数据，可上传1个或多个Json数据，方便临时添加测试数据.
+
+ * 另一种，编写shell，在应用启动后，在terminal执行./upload-running-informations.sh 可上传大批量数据。关键代码如下：
  ```
  #!/usr/bin/env bash
 curl -H "Content-type: application/json" localhost:8080/bulkUpload  -d @runningInformations.json
