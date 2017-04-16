@@ -47,10 +47,10 @@ curl -H "Content-type: application/json" localhost:8080/bulkUpload  -d @runningI
 ```
 ### 输出
 因为使用了RESTcontroller，数据的存取都通过 http request 完成。
-*http://localhost:8080/bulkUpload ：批量上传数据
-*http://localhost:8080/purge ：删除所有数据
-*http://localhost:8080/deleteByRunningId/{runningId}  ： 按RunningID来删除相应数据
-*http://localhost:8080/list 列出所有结果（ 返回结果根据healthWarningLevel从高到底进行排序，默认显示第一页，每页2个数据，并根据requirements进行删选，有些属性不输出），输出格式如下：
+* http://localhost:8080/bulkUpload ：批量上传数据
+* http://localhost:8080/purge ：删除所有数据
+* http://localhost:8080/deleteByRunningId/{runningId}  ： 按RunningID来删除相应数据
+* http://localhost:8080/list 列出所有结果（ 返回结果根据healthWarningLevel从高到底进行排序，默认显示第一页，每页2个数据，并根据requirements进行删选，有些属性不输出），输出格式如下：
 ```
 [
   {
