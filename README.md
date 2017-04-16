@@ -8,7 +8,7 @@
 
 ### 输入
 
-输入的数据为JSON格式的源数据，格式如下：
+输入数据为JSON格式的源数据，格式如下：
 ```
 [
   {
@@ -56,7 +56,7 @@ curl -H "Content-type: application/json" localhost:8080/bulkUpload  -d @runningI
 * http://localhost:8080/deleteByRunningId/{runningId}  ： 按RunningID来删除相应数据
 * http://localhost:8080/list 列出所有结果（ 返回结果根据healthWarningLevel从高到底进行排序，默认显示第一页，每页2个数据，并根据requirements进行删选，有些属性不输出）.
 
-输出格式如下：
+输出为JSON respon，格式如下：
 ```
 [
   {
@@ -118,6 +118,116 @@ curl -H "Content-type: application/json" localhost:8080/bulkUpload  -d @runningI
 ### 5.创建实体类
 domain里的RunningInformation class ,UserInfo class，二者关系目前为为1对1其中userId为自动生成的ID（在数据库中为identity(1,1))，
 这两个实体类关系是embeded 和 embedable.
+主要代码如下：
+```
+@Table (name ="private")
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@Data
+@Entity
+public class RunningInformation {
+
+    private enum HealthWarningLevel { HIGH,NORMAL,LOW;}
+
+
+
+    private String runningId;
+    private double totalRunningTime;
+    private int heartRate;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long Id;
+
+
+    @Embedded
+    private final UserInfo userInfo;
+
+    private HealthWarningLevel healthWarningLevel;
+
+    private double latitude;
+    private double longitude;
+    private double runningDistance;
+    private Date timeStamp;
+
+    public RunningInformation(){
+
+        this.userInfo = null;
+    }
+    public RunningInformation(final UserInfo userInfo){
+        this.userInfo = userInfo;
+    }
+
+    @JsonCreator
+    public RunningInformation(
+            @JsonProperty("runningId") String runningId,
+            @JsonProperty("longitude") String longitude,
+            @JsonProperty("latitude") String latitude,
+            @JsonProperty("runningDistance") String runningDistance,
+            @JsonProperty("totalRunningTime") String totalRunningTime,
+            @JsonProperty("heartRate") String heartRate,
+            @JsonProperty("userInfo") UserInfo userInfo,
+            @JsonProperty("timeStamp") String timeStamp) {
+        this.runningId = runningId;
+        this.longitude = Double.parseDouble(longitude);
+        this.latitude = Double.parseDouble(latitude);
+        this.runningDistance = Double.parseDouble(runningDistance);
+        this.totalRunningTime = Double.parseDouble(totalRunningTime);
+        this.heartRate = _getRandomHeartRate(60,200);
+        this.timeStamp = new Date();
+        this.userInfo = userInfo;
+        if(this.heartRate>120){
+            this.healthWarningLevel = HealthWarningLevel.HIGH;
+        }
+        else if(this.heartRate >75){
+            this.healthWarningLevel = HealthWarningLevel.NORMAL;
+        }
+        else if (this.heartRate >=60){
+            this.healthWarningLevel = HealthWarningLevel.LOW;
+        }else {
+            //option 1: Danger
+            //option 2: Dintentionally left blank
+            //option 3: Exception
+            //option 4: Print warning
+        }
+        System.out.println("check random value ---->"+this.heartRate);
+    }
+
+    public String getUsername(){
+
+        return this.userInfo == null ? null : this.userInfo.getUserName();
+    }
+
+    public String getAddress(){
+        return this.userInfo == null ? null : this.userInfo.getAddress();
+    }
+
+    private int _getRandomHeartRate(int min,int max){
+        Random rn = new Random();
+        return min+rn.nextInt(max-min+1);
+    }
+}
+```
+
+```
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@Embeddable
+@Data
+public class UserInfo {
+    private String userName;
+    private String address;
+
+    public UserInfo() {
+
+    }
+    @JsonCreator
+    public UserInfo(
+            @JsonProperty("username") String userName,
+            @JsonProperty("address") String address) {
+        this.userName = userName;
+        this.address = address;
+    }
+}
+```
 
 ### 6.创建Repository接口继承jpaRepository   
 项目的RunningInformationRepository接口实现了JpaRepository接口；（实际上JpaRepository实现了PagingAndSortingRepository接口，PagingAndSortingRepository接口实现了CrudRepository接口，CrudRepository接口实现了Repository接口） 因为项目需要返回所有结果，并排序和分页。我调用findAll方法，JpaRepository接口返回的是List, PagingAndSortingRepository和CrudRepository返回的是迭代器；所以我选择JpaRepository接口。
@@ -136,7 +246,7 @@ public interface RunningInformationRepository extends JpaRepository<RunningInfor
 ```
 ### 7.创建RestController 
 RunningInformationAnalysisController，实现requestmaping。根据需求，提供4种功能：
-/bulkUpload ：批量上传数据，关键代码如下：
+#### /bulkUpload ：批量上传数据，关键代码如下：
 ```
 @RequestMapping(value = "/bulkUpload", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
@@ -150,7 +260,7 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
         return runningInformationRepository.save(runningInformations);
     }
  ```
-/deleteByRunningId/{runningId}  ： 按RunningID来删除实体 （实现删除多个结果值的功能）,关键代码如下：
+#### /deleteByRunningId/{runningId}  ： 按RunningID来删除实体 （实现删除多个结果值的功能）,关键代码如下：
 ```
 @RequestMapping(value = "/deleteByRunningId/{runningId}", method = RequestMethod.DELETE)
     public void deleteByRunningId(@PathVariable("runningId") String runningId) {
@@ -169,8 +279,16 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
 
         }
     }
-```    
-/list 列出所有结果（实现了根据requirements输出部分属性，有些属性不输出）,关键代码如下：
+```    
+#### /list 列出所有结果，
+实现按照healthWarningLevel排序，此处因为healthWarningLevel是枚举类型，且根据heartRate的值得到的枚举值，无法根据枚举值排序，所以改为根据heartRate排序，更好的实现了需求。
+
+实现了根据requirements输出部分属性，有些属性不输出, 有两种方法：
+
+* 第一种是在实体类的属性前面加@JsonIgnore，可以实现输出不显示。但是这种办法无法扩展，限定了应用中所有输出都是如此。
+* 第二种，是在restcontroller 这一层，加一些过滤和处理。 获取到rawdata，选择部分属性值，复制到新建的JSONobject里，加以输出，这种办法扩展性比较好。本项目采取这种方式控制输出格式。
+
+关键代码如下：
 ``` 
    @RequestMapping(value="/list", method = RequestMethod.GET)
     public ResponseEntity<List<JSONObject>> findAll(@RequestParam(name = "page", defaultValue = kDefaultPage) Integer page,
@@ -201,7 +319,7 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
          return runningInformationRepository.findAll(pageable);
     }
 ``` 
-/purge 删除所有数据
+#### /purge 删除所有数据
 ``` 
 @RequestMapping(value = "/purge", method = RequestMethod.DELETE)
     public void purge() {
@@ -219,13 +337,26 @@ java -jar ./target/Running-Information-Analysis-Service-1.0.0.BUILD-SNAPSHOT.jar
 
 ```
 ### 打开postman插件
-输入localhost:8080/list
+输入 localhost:8080/list
 
-输入localhost:8080/deleteByRunningId/07e8db69-99f2-4fe2-b65a-52fbbdf8c32c
+输入 localhost:8080/deleteByRunningId/07e8db69-99f2-4fe2-b65a-52fbbdf8c32c
 
 输入 localhost:8080/purge
 
 输入 localhost:8080/bulkUpload 此处，source data 贴在Body，并选择Json格式
+
+输入 localhost:8080/list
+
+同时，可以访问mysql数据库来查看数据的变化，使用
+```
+mysql --host=127.0.0.1 --port=3306 --user=root --password=root
+
+mysql> show databases；
+mysql> use running_information_analysis_db;
+mysql> select * from private;
+```
+
+end
 
 
 
