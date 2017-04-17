@@ -42,15 +42,17 @@
   ]
   ```
   
-输入方式有两种:
+输入方式有三种:
 
-* 一种使用 网页/bulkUpload 方式，在Body处复制源数据，可上传1个或多个Json数据，方便临时添加测试数据.
+* 第一种使用 网页request /bulkUpload 方式，需在Body处准备好源数据，可上传1个或多个Json数据，方便临时添加测试数据.
 
- * 另一种，编写shell，在应用启动后，在terminal执行./upload-running-informations.sh 可上传大批量数据。关键代码如下：
+* 第二种，编写shell，在应用启动后，在terminal执行./upload-running-informations.sh 可上传大批量数据。关键代码如下：
  ```
  #!/usr/bin/env bash
 curl -H "Content-type: application/json" localhost:8080/bulkUpload  -d @runningInformations.json
 ```
+* 第三种： 随机上传数据，提交网页request /randomUpload 方式，不需要Body处准备数据。方便临时添加测试数据。
+
 ### 输出
 因为使用了RESTcontroller，数据的存取都通过 http request 完成。
 * https://localhost:8080/bulkUpload ：批量上传数据
