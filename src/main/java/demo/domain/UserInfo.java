@@ -21,6 +21,7 @@ public class UserInfo {
     public UserInfo() {
 
     }
+
     @JsonCreator
     public UserInfo(
             @JsonProperty("username") String userName,

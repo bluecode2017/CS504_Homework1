@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 //@RepositoryRestResource(collectionResourceRel = "runningInformations")
-public interface RunningInformationRepository extends JpaRepository<RunningInformation,Long> {
+public interface RunningInformationRepository extends JpaRepository<RunningInformation, Long> {
 
     Page<RunningInformation> findAll(Pageable pageable);
 

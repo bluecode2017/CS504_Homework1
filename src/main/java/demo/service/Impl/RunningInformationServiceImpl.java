@@ -17,10 +17,12 @@ public class RunningInformationServiceImpl implements RunningInformationService 
 
 
     private RunningInformationRepository runningInformationRepository;
+
     @Autowired
     public RunningInformationServiceImpl(RunningInformationRepository runningInformationRepository) {
         this.runningInformationRepository = runningInformationRepository;
     }
+
     @Override
     public List<RunningInformation> saveRunningInformation(List<RunningInformation> runningInformations) {
         return runningInformationRepository.save(runningInformations);
@@ -30,26 +32,26 @@ public class RunningInformationServiceImpl implements RunningInformationService 
     public void deleteByRunningId(String runningId) {
 
         List<RunningInformation> runningInformationList = new ArrayList<RunningInformation>();
-        runningInformationList=runningInformationRepository.findByRunningId(runningId);
-        for(RunningInformation temp: runningInformationList) {
+        runningInformationList = runningInformationRepository.findByRunningId(runningId);
+        for (RunningInformation temp : runningInformationList) {
 
-                runningInformationRepository.delete(temp);
+            runningInformationRepository.delete(temp);
 
         }
     }
 
     @Override
     public Page<RunningInformation> findAll(Pageable pageable) {
-         return runningInformationRepository.findAll(pageable);
+        return runningInformationRepository.findAll(pageable);
     }
 
     @Override
-    public void deleteAll(){
-         runningInformationRepository.deleteAll();
+    public void deleteAll() {
+        runningInformationRepository.deleteAll();
     }
 
     @Override
-    public void saveRandomOne(RunningInformation runningInformation){
+    public void saveRandomOne(RunningInformation runningInformation) {
         runningInformationRepository.save(runningInformation);
     }
 

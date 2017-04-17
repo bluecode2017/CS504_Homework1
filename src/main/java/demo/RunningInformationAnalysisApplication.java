@@ -9,9 +9,9 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @ComponentScan
 public class RunningInformationAnalysisApplication {
-    public static void main(String[] args){
+    public static void main(String[] args) {
 
-        SpringApplication.run(RunningInformationAnalysisApplication.class,args);
+        SpringApplication.run(RunningInformationAnalysisApplication.class, args);
     }
 }
 
