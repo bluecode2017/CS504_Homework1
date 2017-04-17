@@ -431,7 +431,7 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
 @RequestMapping(value="/listallinformation", method = RequestMethod.GET)
     public Page<RunningInformation> findAllInfo(@RequestParam(name = "page", defaultValue = kDefaultPage) Integer page,
                                                     @RequestParam(name = "size",defaultValue = kDefaultItemPerPage) Integer size){
-        Sort sort = new Sort(Sort.Direction.DESC,"healthWarningLevel");
+        Sort sort = new Sort(Sort.Direction.DESC,"healthRate");
         Pageable pageable = new PageRequest(page,size,sort);
         return runningInformationService.findAll(pageable);
     }
