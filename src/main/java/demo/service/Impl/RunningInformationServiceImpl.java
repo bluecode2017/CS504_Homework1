@@ -48,4 +48,9 @@ public class RunningInformationServiceImpl implements RunningInformationService 
          runningInformationRepository.deleteAll();
     }
 
+    @Override
+    public void saveRandomOne(RunningInformation runningInformation){
+        runningInformationRepository.save(runningInformation);
+    }
+
 }

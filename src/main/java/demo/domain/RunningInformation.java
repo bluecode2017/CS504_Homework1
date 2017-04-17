@@ -89,6 +89,7 @@ public class RunningInformation {
         return this.userInfo == null ? null : this.userInfo.getAddress();
     }
 
+
     private int _getRandomHeartRate(int min,int max){
         Random rn = new Random();
         return min+rn.nextInt(max-min+1);

@@ -1,6 +1,7 @@
 package demo.restcontroller;
 
 import demo.domain.RunningInformation;
+import demo.domain.UserInfo;
 import demo.service.RunningInformationService;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -30,6 +32,8 @@ public class RunningInformationAnalysisController {
     private String healthWarningLevel = "healthWarningLevel";
     private final String kDefaultPage = "0";
     private final String kDefaultItemPerPage = "2";
+
+    private final String allChar = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     @Autowired
     private RunningInformationService runningInformationService;
@@ -77,6 +81,38 @@ public class RunningInformationAnalysisController {
     @RequestMapping(value = "/purge", method = RequestMethod.DELETE)
     public void purge() {
         this.runningInformationService.deleteAll();
+    }
+
+
+    @RequestMapping(value = "/randomUpload", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public void saveRandomOne() {
+
+        UserInfo userInfo = new UserInfo(_generateUsername() ,"504 CS Street, Mountain View, CA 88888");
+        RunningInformation runningInformation = new  RunningInformation(userInfo);
+        runningInformation.setRunningId(_generateRunningId());
+        runningInformation.setLatitude(39.927434);
+        runningInformation.setLongitude(-76.635816);
+        runningInformation.setRunningDistance(4000);
+        runningInformation.setTimeStamp(new Date());
+        runningInformation.setTotalRunningTime(1000);
+        runningInformation.setHeartRate(0);
+        runningInformationService.saveRandomOne(runningInformation);
+    }
+
+    private String _generateString(int length) {
+        StringBuffer sb = new StringBuffer();
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            sb.append(allChar.charAt(random.nextInt(allChar.length())));
+        }
+        return sb.toString();
+    }
+    private String _generateRunningId() {
+        return _generateString(8)+"-"+_generateString(4)+"-"+_generateString(4)+"-"+_generateString(4)+"-"+_generateString(12);
+    }
+    private String _generateUsername() {
+        return _generateString(5);
     }
 
 }

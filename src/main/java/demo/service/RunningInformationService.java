@@ -16,4 +16,5 @@ public interface RunningInformationService {
     public Page<RunningInformation> findAll(Pageable pageable);
     public void deleteAll();
 
+    public void saveRandomOne(RunningInformation runningInformation);
 }
