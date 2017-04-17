@@ -454,9 +454,8 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
     }
 ```
 
-
-
-end
+## LINCENSE
+[Apache](https://github.com/bluecode2017/CS504_Homework1/blob/master/LICENSE)
 
 
 
