@@ -4,6 +4,7 @@
 
 * 此项目为 RunningTrackingProject的其中一个backend的service组件, 采用SpringBoot+SpringData+mysql 技术实现了RunningInformation数据上传 和 查询主要数据。
 * 具体功能需求请参见当前目录下的《ProjectRequirements》
+* 增加了一项扩展功能： 可以上传一条random 的dummy data，不需要手工准备数据.
 
 ## 输入输出
 
@@ -41,21 +42,24 @@
   ]
   ```
   
-输入方式有两种:
+输入方式有三种:
 
-* 一种使用 网页/bulkUpload 方式，在Body处复制源数据，可上传1个或多个Json数据，方便临时添加测试数据.
+* 第一种使用 网页request /bulkUpload 方式，需在Body处准备好源数据，可上传1个或多个Json数据，方便临时添加测试数据.
 
- * 另一种，编写shell，在应用启动后，在terminal执行./upload-running-informations.sh 可上传大批量数据。关键代码如下：
+* 第二种，编写shell，在应用启动后，在terminal执行./upload-running-informations.sh 可上传大批量数据。关键代码如下：
  ```
  #!/usr/bin/env bash
 curl -H "Content-type: application/json" localhost:8080/bulkUpload  -d @runningInformations.json
 ```
+* 第三种： 随机上传数据，提交网页request /randomUpload 方式，不需要Body处准备数据。方便临时添加测试数据。
+
 ### 输出
 因为使用了RESTcontroller，数据的存取都通过 http request 完成。
 * https://localhost:8080/bulkUpload ：批量上传数据
 * https://localhost:8080/purge ：删除所有数据
 * https://localhost:8080/deleteByRunningId/{runningId}  ： 按RunningID来删除相应数据
 * https://localhost:8080/list 列出所有结果（ 返回结果根据healthWarningLevel从高到底进行排序，默认显示第一页，每页2个数据，并根据requirements进行删选，有些属性不输出）.
+* https://localhost:8080/randomUpload 上传一条数据，random随机生成runningID和userName。
 
 输出为JSON respon，格式如下：
 ```
@@ -279,7 +283,7 @@ public interface RunningInformationRepository extends JpaRepository<RunningInfor
 }
 ```
 ###  7.创建RestController 
-RunningInformationAnalysisController，实现requestmaping。根据需求，提供4种功能：
+RunningInformationAnalysisController，实现requestmaping。根据需求，提供5种功能：
 
 ####  /bulkUpload ：批量上传数据，关键代码如下：
 ```
@@ -355,6 +359,16 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
          return runningInformationRepository.findAll(pageable);
     }
 ``` 
+#### /listallinformation 显示所有原始数据及页面排序分页信息
+```
+@RequestMapping(value="/listallinformation", method = RequestMethod.GET)
+    public Page<RunningInformation> findAllInfo(@RequestParam(name = "page", defaultValue = kDefaultPage) Integer page,
+                                                    @RequestParam(name = "size",defaultValue = kDefaultItemPerPage) Integer size){
+        Sort sort = new Sort(Sort.Direction.DESC,"healthWarningLevel");
+        Pageable pageable = new PageRequest(page,size,sort);
+        return runningInformationService.findAll(pageable);
+    }
+```
 
 ####  /purge 删除所有数据
 ``` 
@@ -363,6 +377,40 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
         this.runningInformationService.deleteAll();
     }
 ``` 
+####  /randomUpload 上传随机的dummy data，
+主要代码为：
+```
+@RequestMapping(value = "/randomUpload", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public void saveRandomOne() {
+
+        UserInfo userInfo = new UserInfo(_generateUsername() ,"504 CS Street, Mountain View, CA 88888");
+        RunningInformation runningInformation = new  RunningInformation(userInfo);
+        runningInformation.setRunningId(_generateRunningId());
+        runningInformation.setLatitude(39.927434);
+        runningInformation.setLongitude(-76.635816);
+        runningInformation.setRunningDistance(4000);
+        runningInformation.setTimeStamp(new Date());
+        runningInformation.setTotalRunningTime(1000);
+        runningInformation.setHeartRate(0);
+        runningInformationService.saveRandomOne(runningInformation);
+    }
+
+    private String _generateString(int length) {
+        StringBuffer sb = new StringBuffer();
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            sb.append(allChar.charAt(random.nextInt(allChar.length())));
+        }
+        return sb.toString();
+    }
+    private String _generateRunningId() {
+        return _generateString(8)+"-"+_generateString(4)+"-"+_generateString(4)+"-"+_generateString(4)+"-"+_generateString(12);
+    }
+    private String _generateUsername() {
+        return _generateString(5);
+    }
+```
 
 ## 启动应用
 ### 在程序目录下，依次执行 启动mysql，编译，运行，上传 
@@ -404,6 +452,8 @@ java -jar ./target/Running-Information-Analysis-Service-1.0.0.BUILD-SNAPSHOT.jar
 输入 localhost:8080/bulkUpload 此处，source data 贴在Body，并选择Json格式
 
 输入 localhost:8080/list
+
+输入 loadlhost:8080/randomUpload
 ```
 
 同时，可以访问mysql数据库来查看数据的变化，如果不存在running_information_analysis_db，就新建.
