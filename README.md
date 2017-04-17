@@ -84,7 +84,59 @@ curl -H "Content-type: application/json" localhost:8080/bulkUpload  -d @runningI
   }
 ]
 ```
+## 启动应用
+### 在程序目录下，依次执行 启动mysql，编译，运行，上传 
 
+1. 下载代码
+```
+git clone https://github.com/bluecode2017/Running-Information-Analysis-Service.git
+cd Running-Information-Analysis-Service
+```
+
+2. 启动数据库
+```
+docker-compose up -d
+```
+
+3. 编译源程序
+```
+mvn clean install
+```
+
+4. 启动server
+```
+java -jar ./target/Running-Information-Analysis-Service-1.0.0.BUILD-SNAPSHOT.jar
+```
+5. 上传数据
+```
+./upload-running-informations.sh
+
+```
+
+### 打开postman插件
+```
+输入 localhost:8080/list
+
+输入 localhost:8080/deleteByRunningId/07e8db69-99f2-4fe2-b65a-52fbbdf8c32c
+
+输入 localhost:8080/purge
+
+输入 localhost:8080/bulkUpload 此处，source data 贴在Body，并选择Json格式
+
+输入 localhost:8080/list
+
+输入 loadlhost:8080/randomUpload
+```
+
+同时，可以访问mysql数据库来查看数据的变化，如果不存在running_information_analysis_db，就新建.
+```
+mysql --host=127.0.0.1 --port=3306 --user=root --password=root
+
+mysql> show databases;
+mysql> create database running_information_analysis_db;
+mysql> use running_information_analysis_db;
+mysql> select * from private;
+```
 ## 实现步骤
 
 项目开发第一阶段，为实现业务功能，忽略存储方式，先用springboot自带的H2database，来测试业务逻辑的实现。
@@ -412,59 +464,7 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
     }
 ```
 
-## 启动应用
-### 在程序目录下，依次执行 启动mysql，编译，运行，上传 
 
-1. 下载代码
-```
-git clone https://github.com/bluecode2017/Running-Information-Analysis-Service.git
-cd Running-Information-Analysis-Service
-```
-
-2. 启动数据库
-```
-docker-compose up -d
-```
-
-3. 编译源程序
-```
-mvn clean install
-```
-
-4. 启动server
-```
-java -jar ./target/Running-Information-Analysis-Service-1.0.0.BUILD-SNAPSHOT.jar
-```
-5. 上传数据
-```
-./upload-running-informations.sh
-
-```
-
-### 打开postman插件
-```
-输入 localhost:8080/list
-
-输入 localhost:8080/deleteByRunningId/07e8db69-99f2-4fe2-b65a-52fbbdf8c32c
-
-输入 localhost:8080/purge
-
-输入 localhost:8080/bulkUpload 此处，source data 贴在Body，并选择Json格式
-
-输入 localhost:8080/list
-
-输入 loadlhost:8080/randomUpload
-```
-
-同时，可以访问mysql数据库来查看数据的变化，如果不存在running_information_analysis_db，就新建.
-```
-mysql --host=127.0.0.1 --port=3306 --user=root --password=root
-
-mysql> show databases;
-mysql> create database running_information_analysis_db;
-mysql> use running_information_analysis_db;
-mysql> select * from private;
-```
 
 end
 
