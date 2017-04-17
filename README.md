@@ -4,7 +4,7 @@
 
 * 此项目为 RunningTrackingProject的其中一个backend的service组件, 采用SpringBoot+SpringData+mysql 技术实现了RunningInformation数据上传 和 查询主要数据。
 * 具体功能需求请参见当前目录下的《ProjectRequirements》
-* 增加了一项扩展功能： 可以上传一条random 的dummy data，不需要手工准备数据.
+** 增加了一项扩展功能： 可以上传一条random 的dummy data，不需要手工准备数据.**
 
 ## 输入输出
 
@@ -51,7 +51,7 @@
  #!/usr/bin/env bash
 curl -H "Content-type: application/json" localhost:8080/bulkUpload  -d @runningInformations.json
 ```
-* 第三种： 随机上传数据，提交网页request /randomUpload 方式，不需要Body处准备数据。方便临时添加测试数据。
+* **第三种： 随机上传数据，提交网页request /randomUpload 方式，不需要Body处准备数据。方便临时添加测试数据。**
 
 ### 输出
 因为使用了RESTcontroller，数据的存取都通过 http request 完成。
@@ -204,6 +204,21 @@ mysql> select * from private;
 
 ### 4.创建主运行程序
 设为@SpringBootApplication 
+创建程序配置文件 application.yml
+```
+Server:
+   port: 8080
+spring:
+   application:
+       name: running-information-analysis-service
+   datasource:
+      url: jdbc:mysql://localhost:3306/running_information_analysis_db
+      username: root
+      password: root
+   jpa:
+      hibernate:
+         ddl-auto: update
+```
 
 ### 5.创建实体类
 domain里的RunningInformation class ,UserInfo class，二者关系目前为为1对1其中userId为自动生成的ID（在数据库中为identity(1,1))，
@@ -435,32 +450,7 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
 @RequestMapping(value = "/randomUpload", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public void saveRandomOne() {
-
-        UserInfo userInfo = new UserInfo(_generateUsername() ,"504 CS Street, Mountain View, CA 88888");
-        RunningInformation runningInformation = new  RunningInformation(userInfo);
-        runningInformation.setRunningId(_generateRunningId());
-        runningInformation.setLatitude(39.927434);
-        runningInformation.setLongitude(-76.635816);
-        runningInformation.setRunningDistance(4000);
-        runningInformation.setTimeStamp(new Date());
-        runningInformation.setTotalRunningTime(1000);
-        runningInformation.setHeartRate(0);
-        runningInformationService.saveRandomOne(runningInformation);
-    }
-
-    private String _generateString(int length) {
-        StringBuffer sb = new StringBuffer();
-        Random random = new Random();
-        for (int i = 0; i < length; i++) {
-            sb.append(allChar.charAt(random.nextInt(allChar.length())));
-        }
-        return sb.toString();
-    }
-    private String _generateRunningId() {
-        return _generateString(8)+"-"+_generateString(4)+"-"+_generateString(4)+"-"+_generateString(4)+"-"+_generateString(12);
-    }
-    private String _generateUsername() {
-        return _generateString(5);
+        runningInformationService.saveRandomOne(RunningInformation.autoGenerate());
     }
 ```
 
