@@ -2,11 +2,75 @@
 
 ## 主要功能
 
-* 此项目为 RunningTrackingProject的其中一个backend的service组件, 采用SpringBoot+SpringData+mysql 技术实现了RunningInformation数据上传 和 查询主要数据。
+* 此项目为 RunningTrackingProject的其中一个backend的service组件, 采用SpringBoot+SpringData+mysql 技术实现了RunningInformation数据上传 和 主要数据的查询。
 * 具体功能需求请参见当前目录下的《ProjectRequirements》
 * **增加了一项扩展功能： 可以上传一条random 的dummy data，不需要手工准备数据.**
 
-## 输入输出
+## 下载启动应用
+### 在程序目录下，依次执行 启动mysql，编译，运行，上传 
+
+1. 下载代码
+```
+git clone https://github.com/bluecode2017/Running-Information-Analysis-Service.git
+cd Running-Information-Analysis-Service
+```
+
+2. 启动数据库
+```
+docker-compose up -d
+```
+初次运行项目之前要先创建数据库
+```
+mysql --host=127.0.0.1 --port=3306 --user=root --password=root
+
+mysql> show databases;
+mysql> create database running_information_analysis_db;
+```
+3. 编译源程序
+```
+mvn clean install
+```
+
+4. 启动server
+```
+java -jar ./target/Running-Information-Analysis-Service-1.0.0.BUILD-SNAPSHOT.jar
+```
+5. 上传数据
+```
+./upload-running-informations.sh
+
+```
+
+### 使用方法
+打开postman插件
+```
+输入GET request 获取 所有数据 
+localhost:8080/list
+
+输入DELETE request， 按RunningID 删除数据
+localhost:8080/deleteByRunningId/07e8db69-99f2-4fe2-b65a-52fbbdf8c32c
+
+输入DEELETE request 
+localhost:8080/purge
+
+输入POST request ，此处将source data 贴在Body，并选择Json格式
+localhost:8080/bulkUpload     
+
+输入GET request localhost:8080/listallinformation
+
+输入POST request loadlhost:8080/randomUpload
+```
+
+同时，可以访问mysql数据库来查看private表里数据的变化.
+```
+mysql --host=127.0.0.1 --port=3306 --user=root --password=root
+
+mysql> show databases;
+mysql> use running_information_analysis_db;
+mysql> select * from private;
+```
+
+## 项目详细说明：输入输出
 
 ### 输入
 
@@ -51,7 +115,7 @@
  #!/usr/bin/env bash
 curl -H "Content-type: application/json" localhost:8080/bulkUpload  -d @runningInformations.json
 ```
-* **第三种： 随机上传数据，提交网页request /randomUpload 方式，不需要Body处准备数据。方便临时添加测试数据。**
+* 第三种： 随机上传数据，提交网页request /randomUpload 方式，不需要Body处准备数据。方便临时添加测试数据。
 
 ### 输出
 因为使用了RESTcontroller，数据的存取都通过 http request 完成。
@@ -61,7 +125,7 @@ curl -H "Content-type: application/json" localhost:8080/bulkUpload  -d @runningI
 * https://localhost:8080/list 列出所有结果（ 返回结果根据healthWarningLevel从高到底进行排序，默认显示第一页，每页2个数据，并根据requirements进行删选，有些属性不输出）.
 * https://localhost:8080/randomUpload 上传一条数据，random随机生成runningID和userName。
 
-输出为JSON respon，格式如下：
+输出为JSON response，格式如下：
 ```
 [
   {
@@ -84,65 +148,8 @@ curl -H "Content-type: application/json" localhost:8080/bulkUpload  -d @runningI
   }
 ]
 ```
-## 启动应用
-### 在程序目录下，依次执行 启动mysql，编译，运行，上传 
 
-1. 下载代码
-```
-git clone https://github.com/bluecode2017/Running-Information-Analysis-Service.git
-cd Running-Information-Analysis-Service
-```
-
-2. 启动数据库
-```
-docker-compose up -d
-```
-初次运行项目之前要先创建数据库
-```
-mysql --host=127.0.0.1 --port=3306 --user=root --password=root
-
-mysql> show databases;
-mysql> create database running_information_analysis_db;
-```
-3. 编译源程序
-```
-mvn clean install
-```
-
-4. 启动server
-```
-java -jar ./target/Running-Information-Analysis-Service-1.0.0.BUILD-SNAPSHOT.jar
-```
-5. 上传数据
-```
-./upload-running-informations.sh
-
-```
-
-### 打开postman插件
-```
-输入 localhost:8080/list
-
-输入 localhost:8080/deleteByRunningId/07e8db69-99f2-4fe2-b65a-52fbbdf8c32c
-
-输入 localhost:8080/purge
-
-输入 localhost:8080/bulkUpload 此处，source data 贴在Body，并选择Json格式
-
-输入 localhost:8080/list
-
-输入 loadlhost:8080/randomUpload
-```
-
-同时，可以访问mysql数据库来查看private表里数据的变化.
-```
-mysql --host=127.0.0.1 --port=3306 --user=root --password=root
-
-mysql> show databases;
-mysql> use running_information_analysis_db;
-mysql> select * from private;
-```
-## 实现步骤
+## 项目实现步骤
 
 * 项目开发第一阶段，为实现业务功能，忽略存储方式，先用springboot自带的H2database，来测试业务逻辑的实现。
 
@@ -150,8 +157,29 @@ mysql> select * from private;
 
 * 项目开发第三阶段，集成测试，上线提交。
 
-* 开发环境 ：Ubuntu OS Virtual Machine + Java JDK 1.8 + Maven + SpringBoot 1.3.0 + MySQL 5.7 + MysqlClient + PostMan
-* 开发工具： Intellij IDEA + Bash Shell
+* 开发环境：Ubuntu OS Virtual Machine + Java JDK 1.8  
+* 主要技术：Maven + SpringBoot 1.3.0 + Spring Data + Lombok + MySQL 5.7 + MysqlClient + PostMan
+* 开发工具：Intellij IDEA + Bash Shell
+
+* 项目结构
+ 
+```
+-src 
+  |--main 
+      |--java  
+          |--demo
+              |--domain  
+                   |--RunningInformation (class  实体类)  
+                   |--UserInfo (class实体类)   
+                   |--RunningInformationRepository (Interface  数据操作DAO) 
+              |---restcontroller      
+                   |--RunningInformationAnalysisController (class  实现requestmapping及部分业务处理)
+              |--service 
+                   |--Impl  
+                         |--RunningInformationServiceImpl (class  实现业务处理逻辑) 
+                   |--RunningInformationBulkUploadController (Interface   业务逻辑层) 
+             |--RunningInformationBulkUploadController (class   启动入口)
+```
 
 ### 1.新建maven project
 
@@ -194,24 +222,6 @@ mysql> select * from private;
 ```
 
 ### 3.创建项目结构
-项目代码结构 
-```
--src 
-  |--main 
-      |--java  
-          |--demo
-              |--domain  
-                   |--RunningInformation (class  实体类)  
-                   |--UserInfo (class实体类)   
-                   |--RunningInformationRepository (Interface  数据操作DAO) 
-              |---restcontroller      
-                   |--RunningInformationAnalysisController (class  实现requestmapping及部分业务处理)
-              |--service 
-                   |--Impl  
-                         |--RunningInformationServiceImpl (class  实现业务处理逻辑) 
-                   |--RunningInformationBulkUploadController (Interface   业务逻辑层) 
-             |--RunningInformationBulkUploadController (class   启动入口)
-```
 
 ### 4.创建主运行程序
 设为@SpringBootApplication 指定此应用为一个spring boot 应用。
@@ -459,6 +469,8 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
         runningInformationService.saveRandomOne(RunningInformation.autoGenerate());
     }
 ```
+## TODO Plan
+将实体类update to 1：n的关系，存储在两张表中
 
 ## LICENSE
 [Apache](https://github.com/bluecode2017/CS504_Homework1/blob/master/LICENSE)
