@@ -6,8 +6,7 @@
 * 具体功能需求请参见当前目录下的《ProjectRequirements》
 * **增加了一项扩展功能： 可以上传一条random 的dummy data，不需要手工准备数据.**
 
-## 下载启动应用
-### 在程序目录下，依次执行 启动mysql，编译，运行，上传 
+## 下载、启动应用
 
 1. 下载代码
 ```
@@ -41,7 +40,7 @@ java -jar ./target/Running-Information-Analysis-Service-1.0.0.BUILD-SNAPSHOT.jar
 
 ```
 
-### 使用方法
+## 使用方法
 打开postman插件
 ```
 输入GET request 获取 所有数据 
@@ -106,7 +105,7 @@ mysql> select * from private;
              |--RunningInformationBulkUploadController (class   启动入口)
 ```
 
-###项目输入输出
+##项目输入输出
 
 输入数据为JSON格式的源数据，格式如下：
 ```
@@ -182,7 +181,7 @@ curl -H "Content-type: application/json" localhost:8080/bulkUpload  -d @runningI
 ]
 ```
 
-## 项目实现步骤
+## 项目开发说明
 
 ### 1.新建maven project
 
