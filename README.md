@@ -105,7 +105,7 @@ mysql> select * from private;
              |--RunningInformationBulkUploadController (class   启动入口)
 ```
 
-##项目输入输出
+## 项目输入输出
 
 输入数据为JSON格式的源数据，格式如下：
 ```
@@ -460,7 +460,7 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
     }
 ```
 ## TODO Plan
-Update Entity class UserInfo 和 RunningInformation， change their relation to 1：n， and save into two seperate table in Mysql。
+Update Entity class UserInfo 和 RunningInformation, change their relationship to 1：n， and save into two seperate table in Mysql。
 
 ## LICENSE
 [Apache](https://github.com/bluecode2017/CS504_Homework1/blob/master/LICENSE)
