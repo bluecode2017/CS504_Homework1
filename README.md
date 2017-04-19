@@ -97,7 +97,13 @@ cd Running-Information-Analysis-Service
 ```
 docker-compose up -d
 ```
+初次运行项目之前要先创建数据库
+```
+mysql --host=127.0.0.1 --port=3306 --user=root --password=root
 
+mysql> show databases;
+mysql> create database running_information_analysis_db;
+```
 3. 编译源程序
 ```
 mvn clean install
@@ -128,12 +134,11 @@ java -jar ./target/Running-Information-Analysis-Service-1.0.0.BUILD-SNAPSHOT.jar
 输入 loadlhost:8080/randomUpload
 ```
 
-同时，可以访问mysql数据库来查看数据的变化，如果不存在running_information_analysis_db，就新建.
+同时，可以访问mysql数据库来查看private表里数据的变化.
 ```
 mysql --host=127.0.0.1 --port=3306 --user=root --password=root
 
 mysql> show databases;
-mysql> create database running_information_analysis_db;
 mysql> use running_information_analysis_db;
 mysql> select * from private;
 ```
@@ -227,7 +232,8 @@ spring:
 ```
 
 ### 5.创建实体类
-domain里的RunningInformation class ,UserInfo class，二者逻辑关系目前为为1对1，一个user 只有一条 running information， 其中userId为自动生成的ID (类似数据库中为identity(1,1)). 这两个实体类关系是embeded 和 embedable.
+domain里的RunningInformation class ,UserInfo class，二者逻辑关系目前为为1对1，一个user 只有一条 running information， 其中userId为自动生成的ID (类似数据库中为identity(1,1)). 这两个实体类关系是embeded 和 embedable. @Table 执行存储在后台数据库名叫private的表里。程序运行后，如果数据库里没有此表，则会自动创建，如果已有，则会直接使用。
+
 主要代码如下：
 ```
 @Table (name ="private")
