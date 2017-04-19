@@ -70,13 +70,17 @@ mysql> use running_information_analysis_db;
 mysql> select * from private;
 ```
 
-## 项目详细说明
+## 版本说明
 
-* 项目开发第一阶段，为实现业务功能，忽略存储方式，先用springboot自带的H2database，来测试业务逻辑的实现。
+* Version 1.0  完成业务功能，忽略存储方式，用springboot自带的H2database，来实现业务逻辑。
 
-* 项目开发第二阶段，业务功能测试通过后，修改后台数据库为mysql， 在pom.xml里增加mysql-connector-java依赖，在application.yml添加 mysql的连接方式；
+* Version 2.0  业务功能测试通过后，修改后台数据库为mysql， 在pom.xml里增加mysql-connector-java依赖，在application.yml添加 mysql的连接方式；
 
-* 项目开发第三阶段，集成测试，提交。
+* Version 2.2  添加扩展功能。
+
+* Version 3.0  改进，更改实体关系为1对n。 改进存储方式。【TODO】
+
+## 项目环境
 
 * 开发环境：Ubuntu OS Virtual Machine + Java JDK 1.8  
 * 主要技术：Maven + SpringBoot 1.3.0 + Spring Data + Lombok + MySQL 5.7 + MysqlClient + PostMan
