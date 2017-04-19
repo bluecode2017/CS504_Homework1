@@ -139,14 +139,20 @@ mysql> select * from private;
 ```
 ## 实现步骤
 
-项目开发第一阶段，为实现业务功能，忽略存储方式，先用springboot自带的H2database，来测试业务逻辑的实现。
-项目开发第二阶段，业务功能测试通过后，修改后台数据库为mysql， 在pom.xml里增加mysql-connector-java依赖，在application.yml添加 mysql的连接方式；
-项目开发第三阶段，集成测试，上线提交
+* 项目开发第一阶段，为实现业务功能，忽略存储方式，先用springboot自带的H2database，来测试业务逻辑的实现。
+
+* 项目开发第二阶段，业务功能测试通过后，修改后台数据库为mysql， 在pom.xml里增加mysql-connector-java依赖，在application.yml添加 mysql的连接方式；
+
+* 项目开发第三阶段，集成测试，上线提交。
+
+* 开发环境 ：Ubuntu OS Virtual Machine + Java JDK 1.8 + Maven + SpringBoot 1.3.0 + MySQL 5.7 + MysqlClient + PostMan
+* 开发工具： Intellij IDEA + Bash Shell
 
 ### 1.新建maven project
 
 ### 2.修改maven配置文件
-修改pom.xml ，加入parent 和dependency 和 build. 其中，spring-boot-starter-parent会加载Spring Boot应用所需的所有默认配置； spring-boot-starter-data-jpa会下载所有Spring Data Jpa所需的依赖； 因为此项目是一个web应用，所以添加spring-boot-starter-web.
+修改pom.xml ，加入parent 和dependency 和 build. 
+其中，spring-boot-starter-parent会加载Spring Boot应用所需的所有默认配置； spring-boot-starter-data-jpa会下载所有Spring Data Jpa所需的依赖； 因为此项目是一个web应用，所以添加spring-boot-starter-web. 引用json-simple 为创建Json 对象. 引用mysql-connector-java, 实现Mysql数据存取. 引用spring-boot-starter-data-rest 实现RESTAPI.
 ```
 <dependencies>
         <dependency>
@@ -190,20 +196,20 @@ mysql> select * from private;
       |--java  
           |--demo
               |--domain  
-                   |--RunningInformation (class 实体类)  
+                   |--RunningInformation (class  实体类)  
                    |--UserInfo (class实体类)   
-                   |--RunningInformationRepository (Interface 数据操作DAO) 
+                   |--RunningInformationRepository (Interface  数据操作DAO) 
               |---restcontroller      
-                   |--RunningInformationAnalysisController (class实现requestmapping及部分业务处理)
+                   |--RunningInformationAnalysisController (class  实现requestmapping及部分业务处理)
               |--service 
                    |--Impl  
-                         |--RunningInformationServiceImpl (class 实现业务处理逻辑) 
-                   |--RunningInformationBulkUploadController (Interface 业务逻辑层) 
-             |--RunningInformationBulkUploadController (class 启动入口)
+                         |--RunningInformationServiceImpl (class  实现业务处理逻辑) 
+                   |--RunningInformationBulkUploadController (Interface   业务逻辑层) 
+             |--RunningInformationBulkUploadController (class   启动入口)
 ```
 
 ### 4.创建主运行程序
-设为@SpringBootApplication 
+设为@SpringBootApplication 指定此应用为一个spring boot 应用。
 创建程序配置文件 application.yml
 ```
 Server:
@@ -221,8 +227,7 @@ spring:
 ```
 
 ### 5.创建实体类
-domain里的RunningInformation class ,UserInfo class，二者关系目前为为1对1其中userId为自动生成的ID（在数据库中为identity(1,1))，
-这两个实体类关系是embeded 和 embedable.
+domain里的RunningInformation class ,UserInfo class，二者逻辑关系目前为为1对1，一个user 只有一条 running information， 其中userId为自动生成的ID (类似数据库中为identity(1,1)). 这两个实体类关系是embeded 和 embedable.
 主要代码如下：
 ```
 @Table (name ="private")
@@ -232,9 +237,6 @@ domain里的RunningInformation class ,UserInfo class，二者关系目前为为1
 public class RunningInformation {
 
     private enum HealthWarningLevel { HIGH,NORMAL,LOW;}
-
-
-
     private String runningId;
     private double totalRunningTime;
     private int heartRate;
@@ -248,14 +250,12 @@ public class RunningInformation {
     private final UserInfo userInfo;
 
     private HealthWarningLevel healthWarningLevel;
-
     private double latitude;
     private double longitude;
     private double runningDistance;
     private Date timeStamp;
 
     public RunningInformation(){
-
         this.userInfo = null;
     }
     public RunningInformation(final UserInfo userInfo){
@@ -337,7 +337,7 @@ public class UserInfo {
 ### 6.创建Repository接口继承jpaRepository   
 项目的RunningInformationRepository接口实现了JpaRepository接口；（实际上JpaRepository实现了PagingAndSortingRepository接口，PagingAndSortingRepository接口实现了CrudRepository接口，CrudRepository接口实现了Repository接口） 因为项目需要返回所有结果，并排序和分页。我调用findAll方法，JpaRepository接口返回的是List, PagingAndSortingRepository和CrudRepository返回的是迭代器；所以我选择JpaRepository接口。
 
-主要代码如下：
+关键代码如下：
 ```
 //@RepositoryRestResource(collectionResourceRel = "runningInformations")
 public interface RunningInformationRepository extends JpaRepository<RunningInformation,Long> {
