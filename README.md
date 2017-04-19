@@ -70,9 +70,39 @@ mysql> use running_information_analysis_db;
 mysql> select * from private;
 ```
 
-## 项目详细说明：输入输出
+## 项目详细说明
 
-### 输入
+* 项目开发第一阶段，为实现业务功能，忽略存储方式，先用springboot自带的H2database，来测试业务逻辑的实现。
+
+* 项目开发第二阶段，业务功能测试通过后，修改后台数据库为mysql， 在pom.xml里增加mysql-connector-java依赖，在application.yml添加 mysql的连接方式；
+
+* 项目开发第三阶段，集成测试，提交。
+
+* 开发环境：Ubuntu OS Virtual Machine + Java JDK 1.8  
+* 主要技术：Maven + SpringBoot 1.3.0 + Spring Data + Lombok + MySQL 5.7 + MysqlClient + PostMan
+* 开发工具：Intellij IDEA + Bash Shell
+
+* 项目结构
+ 
+```
+-src 
+  |--main 
+      |--java  
+          |--demo
+              |--domain  
+                   |--RunningInformation (class  实体类)  
+                   |--UserInfo (class实体类)   
+                   |--RunningInformationRepository (Interface  数据操作DAO) 
+              |---restcontroller      
+                   |--RunningInformationAnalysisController (class  实现requestmapping及部分业务处理)
+              |--service 
+                   |--Impl  
+                         |--RunningInformationServiceImpl (class  实现业务处理逻辑) 
+                   |--RunningInformationBulkUploadController (Interface   业务逻辑层) 
+             |--RunningInformationBulkUploadController (class   启动入口)
+```
+
+###项目输入输出
 
 输入数据为JSON格式的源数据，格式如下：
 ```
@@ -117,7 +147,6 @@ curl -H "Content-type: application/json" localhost:8080/bulkUpload  -d @runningI
 ```
 * 第三种： 随机上传数据，提交网页request /randomUpload 方式，不需要Body处准备数据。方便临时添加测试数据。
 
-### 输出
 因为使用了RESTcontroller，数据的存取都通过 http request 完成。
 * https://localhost:8080/bulkUpload ：批量上传数据
 * https://localhost:8080/purge ：删除所有数据
@@ -150,36 +179,6 @@ curl -H "Content-type: application/json" localhost:8080/bulkUpload  -d @runningI
 ```
 
 ## 项目实现步骤
-
-* 项目开发第一阶段，为实现业务功能，忽略存储方式，先用springboot自带的H2database，来测试业务逻辑的实现。
-
-* 项目开发第二阶段，业务功能测试通过后，修改后台数据库为mysql， 在pom.xml里增加mysql-connector-java依赖，在application.yml添加 mysql的连接方式；
-
-* 项目开发第三阶段，集成测试，上线提交。
-
-* 开发环境：Ubuntu OS Virtual Machine + Java JDK 1.8  
-* 主要技术：Maven + SpringBoot 1.3.0 + Spring Data + Lombok + MySQL 5.7 + MysqlClient + PostMan
-* 开发工具：Intellij IDEA + Bash Shell
-
-* 项目结构
- 
-```
--src 
-  |--main 
-      |--java  
-          |--demo
-              |--domain  
-                   |--RunningInformation (class  实体类)  
-                   |--UserInfo (class实体类)   
-                   |--RunningInformationRepository (Interface  数据操作DAO) 
-              |---restcontroller      
-                   |--RunningInformationAnalysisController (class  实现requestmapping及部分业务处理)
-              |--service 
-                   |--Impl  
-                         |--RunningInformationServiceImpl (class  实现业务处理逻辑) 
-                   |--RunningInformationBulkUploadController (Interface   业务逻辑层) 
-             |--RunningInformationBulkUploadController (class   启动入口)
-```
 
 ### 1.新建maven project
 
@@ -312,21 +311,7 @@ public class RunningInformation {
         }
         System.out.println("check random value ---->"+this.heartRate);
     }
-
-    public String getUsername(){
-
-        return this.userInfo == null ? null : this.userInfo.getUserName();
-    }
-
-    public String getAddress(){
-        return this.userInfo == null ? null : this.userInfo.getAddress();
-    }
-
-    private int _getRandomHeartRate(int min,int max){
-        Random rn = new Random();
-        return min+rn.nextInt(max-min+1);
-    }
-}
+   
 ```
 
 ```
@@ -351,7 +336,9 @@ public class UserInfo {
 ```
 
 ### 6.创建Repository接口继承jpaRepository   
-项目的RunningInformationRepository接口实现了JpaRepository接口；（实际上JpaRepository实现了PagingAndSortingRepository接口，PagingAndSortingRepository接口实现了CrudRepository接口，CrudRepository接口实现了Repository接口） 因为项目需要返回所有结果，并排序和分页。我调用findAll方法，JpaRepository接口返回的是List, PagingAndSortingRepository和CrudRepository返回的是迭代器；所以我选择JpaRepository接口。
+项目的RunningInformationRepository接口实现了JpaRepository接口；（实际上JpaRepository实现了PagingAndSortingRepository接口，PagingAndSortingRepository接口实现了CrudRepository接口，CrudRepository接口实现了Repository接口） 
+
+因为项目需要返回所有结果，并排序和分页。我调用findAll方法，JpaRepository接口返回的是List, PagingAndSortingRepository和CrudRepository返回的是迭代器；所以我选择JpaRepository接口。
 
 关键代码如下：
 ```
@@ -453,14 +440,14 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
     }
 ```
 
-####  /purge 删除所有数据
+####  /purge  delete all data
 ``` 
 @RequestMapping(value = "/purge", method = RequestMethod.DELETE)
     public void purge() {
         this.runningInformationService.deleteAll();
     }
 ``` 
-####  /randomUpload 上传随机的dummy data，
+####  /randomUpload to upload random dummy data，
 主要代码为：
 ```
 @RequestMapping(value = "/randomUpload", method = RequestMethod.POST)
@@ -470,7 +457,7 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
     }
 ```
 ## TODO Plan
-将实体类update to 1：n的关系，存储在两张表中
+Update Entity class UserInfo 和 RunningInformation， change their relation to 1：n， and save into two seperate table in Mysql。
 
 ## LICENSE
 [Apache](https://github.com/bluecode2017/CS504_Homework1/blob/master/LICENSE)
