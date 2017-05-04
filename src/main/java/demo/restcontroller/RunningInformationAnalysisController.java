@@ -36,18 +36,18 @@ public class RunningInformationAnalysisController {
     @Autowired
     private RunningInformationService runningInformationService;
 
-    @RequestMapping(value = "/bulkUpload", method = RequestMethod.POST)
+    @RequestMapping(value = "/runninginformations", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public void bulkUpload(@RequestBody List<RunningInformation> runningInformations) {
         runningInformationService.saveRunningInformation(runningInformations);
     }
 
-    @RequestMapping(value = "/deleteByRunningId/{runningId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/runninginformations/{runningId}", method = RequestMethod.DELETE)
     public void deleteByRunningId(@PathVariable("runningId") String runningId) {
         runningInformationService.deleteByRunningId(runningId);
     }
 
-    @RequestMapping(value = "/listallinformation", method = RequestMethod.GET)
+    @RequestMapping(value = "/runninginformations/all", method = RequestMethod.GET)
     public Page<RunningInformation> findAllInfo(@RequestParam(name = "page", defaultValue = kDefaultPage) Integer page,
                                                 @RequestParam(name = "size", defaultValue = kDefaultItemPerPage) Integer size) {
         Sort sort = new Sort(Sort.Direction.DESC, "healthWarningLevel");
@@ -55,7 +55,7 @@ public class RunningInformationAnalysisController {
         return runningInformationService.findAll(pageable);
     }
 
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/runninginformations", method = RequestMethod.GET)
     public ResponseEntity<List<JSONObject>> findAll(@RequestParam(name = "page", defaultValue = kDefaultPage) Integer page,
                                                     @RequestParam(name = "size", defaultValue = kDefaultItemPerPage) Integer size) {
         Sort sort = new Sort(Sort.Direction.DESC, "heartRate");
@@ -77,13 +77,13 @@ public class RunningInformationAnalysisController {
         return new ResponseEntity<List<JSONObject>>(results, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/purge", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/runninginformations", method = RequestMethod.DELETE)
     public void purge() {
         this.runningInformationService.deleteAll();
     }
 
 
-    @RequestMapping(value = "/randomUpload", method = RequestMethod.POST)
+    @RequestMapping(value = "/runninginformations/ran", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public void saveRandomOne() {
         runningInformationService.saveRandomOne(RunningInformation.autoGenerate());

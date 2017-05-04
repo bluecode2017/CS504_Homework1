@@ -4,7 +4,7 @@
 
 * 此项目为 RunningTrackingProject的其中一个backend的service组件, 采用SpringBoot+SpringData+mysql 技术实现了RunningInformation数据上传 和 查询主要数据。
 * 具体功能需求请参见当前目录下的《ProjectRequirements》
-** 增加了一项扩展功能： 可以上传一条random 的dummy data，不需要手工准备数据.**
+* 增加了一项扩展功能： 可以上传一条random 的dummy data，不需要手工准备数据.
 
 ## 输入输出
 
@@ -55,11 +55,11 @@ curl -H "Content-type: application/json" localhost:8080/bulkUpload  -d @runningI
 
 ### 输出
 因为使用了RESTcontroller，数据的存取都通过 http request 完成。
-* https://localhost:8080/bulkUpload ：批量上传数据
-* https://localhost:8080/purge ：删除所有数据
-* https://localhost:8080/deleteByRunningId/{runningId}  ： 按RunningID来删除相应数据
-* https://localhost:8080/list 列出所有结果（ 返回结果根据healthWarningLevel从高到底进行排序，默认显示第一页，每页2个数据，并根据requirements进行删选，有些属性不输出）.
-* https://localhost:8080/randomUpload 上传一条数据，random随机生成runningID和userName。
+* POST https://localhost:8080/runninginformations ：批量上传数据
+* DELETE https://localhost:8080/runninginformations ：删除所有数据
+* DELETE https://localhost:8080/runninginformations/{runningId}  ： 按RunningID来删除相应数据
+* GET https://localhost:8080/runninginformations 列出所有结果（ 返回结果根据healthWarningLevel从高到底进行排序，默认显示第一页，每页2个数据，并根据requirements进行删选，有些属性不输出）.
+* POST https://localhost:8080/runninginformations/ran 上传一条数据，random随机生成runningID和userName。
 
 输出为JSON respon，格式如下：
 ```
@@ -97,6 +97,13 @@ cd Running-Information-Analysis-Service
 ```
 docker-compose up -d
 ```
+初次运行项目之前要先创建数据库
+```
+mysql --host=127.0.0.1 --port=3306 --user=root --password=root
+
+mysql> show databases;
+mysql> create database running_information_analysis_db;
+```
 
 3. 编译源程序
 ```
@@ -115,17 +122,15 @@ java -jar ./target/Running-Information-Analysis-Service-1.0.0.BUILD-SNAPSHOT.jar
 
 ### 打开postman插件
 ```
-输入 localhost:8080/list
+输入 GET localhost:8080/runninginformations
 
-输入 localhost:8080/deleteByRunningId/07e8db69-99f2-4fe2-b65a-52fbbdf8c32c
+输入 DELETE localhost:8080/runninginformations/07e8db69-99f2-4fe2-b65a-52fbbdf8c32c
 
-输入 localhost:8080/purge
+输入 GET localhost:8080/runninginformations
 
-输入 localhost:8080/bulkUpload 此处，source data 贴在Body，并选择Json格式
+输入 POST localhost:8080/runninginformations 此处，source data 贴在Body，并选择Json格式
 
-输入 localhost:8080/list
-
-输入 loadlhost:8080/randomUpload
+输入 POST loadlhost:8080/runninginformations/ran
 ```
 
 同时，可以访问mysql数据库来查看数据的变化，如果不存在running_information_analysis_db，就新建.
@@ -133,7 +138,6 @@ java -jar ./target/Running-Information-Analysis-Service-1.0.0.BUILD-SNAPSHOT.jar
 mysql --host=127.0.0.1 --port=3306 --user=root --password=root
 
 mysql> show databases;
-mysql> create database running_information_analysis_db;
 mysql> use running_information_analysis_db;
 mysql> select * from private;
 ```
@@ -352,9 +356,9 @@ public interface RunningInformationRepository extends JpaRepository<RunningInfor
 ###  7.创建RestController 
 RunningInformationAnalysisController，实现requestmaping。根据需求，提供5种功能：
 
-####  /bulkUpload ：批量上传数据，关键代码如下：
+####  /runninginformations ：批量上传数据，关键代码如下：
 ```
-@RequestMapping(value = "/bulkUpload", method = RequestMethod.POST)
+@RequestMapping(value = "/runninginformations", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public void bulkUpload(@RequestBody List<RunningInformation> runningInformations) {
         runningInformationService.saveRunningInformation(runningInformations);
@@ -366,9 +370,9 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
         return runningInformationRepository.save(runningInformations);
     }
  ```
-####  /deleteByRunningId/{runningId}  ： 按RunningID来删除数据 （如果一个RunningID对应多条记录，则删除多条。实现删除多个结果值的功能）,关键代码如下：
+####  /runninginformations/{runningId}  ： 按RunningID来删除数据 （如果一个RunningID对应多条记录，则删除多条。实现删除多个结果值的功能）,关键代码如下：
 ```
-@RequestMapping(value = "/deleteByRunningId/{runningId}", method = RequestMethod.DELETE)
+@RequestMapping(value = "/runninginformations/{runningId}", method = RequestMethod.DELETE)
     public void deleteByRunningId(@PathVariable("runningId") String runningId) {
         runningInformationService.deleteByRunningId(runningId);
     }
@@ -387,7 +391,7 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
     }
 ```
 
-#### /list 列出所有结果，
+#### /runninginformations 列出所有结果，
 实现按照healthWarningLevel排序，此处因为healthWarningLevel是枚举类型，且根据heartRate的值得到的枚举值，无法根据枚举值排序，所以改为根据heartRate排序，更好的实现了需求。
 
 实现了根据requirements输出部分属性，有些属性不输出, 有两种方法：
@@ -397,7 +401,7 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
 
 关键代码如下：
 ``` 
-   @RequestMapping(value="/list", method = RequestMethod.GET)
+   @RequestMapping(value="/runninginformations", method = RequestMethod.GET)
     public ResponseEntity<List<JSONObject>> findAll(@RequestParam(name = "page", defaultValue = kDefaultPage) Integer page,
                                               @RequestParam(name = "size",defaultValue = kDefaultItemPerPage) Integer size){
         Sort sort = new Sort(Sort.Direction.DESC,"heartRate");
@@ -426,28 +430,18 @@ RunningInformationAnalysisController，实现requestmaping。根据需求，提�
          return runningInformationRepository.findAll(pageable);
     }
 ``` 
-#### /listallinformation 显示所有原始数据及页面排序分页信息
-```
-@RequestMapping(value="/listallinformation", method = RequestMethod.GET)
-    public Page<RunningInformation> findAllInfo(@RequestParam(name = "page", defaultValue = kDefaultPage) Integer page,
-                                                    @RequestParam(name = "size",defaultValue = kDefaultItemPerPage) Integer size){
-        Sort sort = new Sort(Sort.Direction.DESC,"healthWarningLevel");
-        Pageable pageable = new PageRequest(page,size,sort);
-        return runningInformationService.findAll(pageable);
-    }
-```
 
-####  /purge 删除所有数据
+####  /runninginformations 删除所有数据
 ``` 
-@RequestMapping(value = "/purge", method = RequestMethod.DELETE)
+@RequestMapping(value = "/runninginformations", method = RequestMethod.DELETE)
     public void purge() {
         this.runningInformationService.deleteAll();
     }
 ``` 
-####  /randomUpload 上传随机的dummy data，
+####  /runninginformations/ran 上传随机的dummy data，
 主要代码为：
 ```
-@RequestMapping(value = "/randomUpload", method = RequestMethod.POST)
+@RequestMapping(value = "/runninginformations/ran", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public void saveRandomOne() {
         runningInformationService.saveRandomOne(RunningInformation.autoGenerate());
