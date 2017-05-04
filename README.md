@@ -4,7 +4,7 @@
 
 * 此项目为 RunningTrackingProject的其中一个backend的service组件, 采用SpringBoot+SpringData+mysql 技术实现了RunningInformation数据上传 和 主要数据的查询。
 * 具体功能需求请参见当前目录下的《ProjectRequirements》
-* **增加了一项扩展功能： 可以上传一条random 的dummy data，不需要手工准备数据.**
+* 增加了一项扩展功能： 可以上传一条random 的dummy data，不需要手工准备数据.
 
 ## 下载、启动应用
 
