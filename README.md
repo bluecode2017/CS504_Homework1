@@ -245,7 +245,9 @@ spring:
 domain里的RunningInformation class ,UserInfo class，二者逻辑关系目前为为1对1，一个user 只有一条 running information， 其中userId为自动生成的ID (类似数据库中为identity(1,1)). 这两个实体类关系是embeded 和 embedable. @Table 执行存储在后台数据库名叫private的表里。程序运行后，如果数据库里没有此表，则会自动创建，如果已有，则会直接使用。
 
 
-### 6.创建Repository接口继承jpaRepository   
+### 6.创建Repository接口继承jpaRepository   
+### 7.创建service
+### 8.创建controller
 
 ## TODO Plan
 Update Entity class UserInfo 和 RunningInformation, change their relationship to 1：n， and save into two seperate table in Mysql。
